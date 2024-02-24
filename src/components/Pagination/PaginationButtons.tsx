@@ -34,20 +34,20 @@ function PaginationButtons({}: IPaginationButtonsProps) {
 
     return (
         <Pagination>
-            <p>Товаров: {searchedProductsId.length}</p>
+            <p>Найдено товаров: {searchedProductsId.length}</p>
             <p>Страниц: {maxPages}</p>
-            <p>Текущая страница: {pageNumber + 1}</p>
             <ButtonsGroup>
-                <DirectionButton 
-                    disabled={pageNumber === 0 || isLoading} 
-                    onClick={() => onClickPrevPage()}>
-                    left
-                </DirectionButton>
+
+                <Button
+                    onClick={() => onClickPrevPage()}
+                    disabled={pageNumber === 0 || isLoading}>
+                    ❮
+                </Button>
 
                 {
-                    
-                    Array.from(new Set([1, pageNumber-1, pageNumber]))
-                        .filter(i => i > 0 && i !== pageNumber+1).map(i => 
+
+                    Array.from(new Set([1, pageNumber - 1]))
+                        .filter(i => i > 0 && i !== pageNumber+1).map(i =>
                             <Button 
                                 key={i} 
                                 onClick={() => onClickNumberPage(i-1)}
@@ -61,7 +61,7 @@ function PaginationButtons({}: IPaginationButtonsProps) {
                 </ActivePageButton>
 
                 {
-                    Array.from(new Set([pageNumber+2, pageNumber+3, pageNumber+4]))
+                    Array.from(new Set([pageNumber+3, maxPages]))
                         .filter(i => i <= maxPages && i !== pageNumber+1).map(i => 
                             <Button 
                                 key={i} 
@@ -71,11 +71,12 @@ function PaginationButtons({}: IPaginationButtonsProps) {
                             </Button>)
                 }
 
-                <DirectionButton 
-                    disabled={pageNumber+1 >= maxPages || isLoading} 
-                    onClick={() => onClickNextPage()}>
-                    right
-                </DirectionButton>
+                <Button
+                    onClick={() => onClickNextPage()}
+                    disabled={pageNumber+1 >= maxPages || isLoading}>
+                    ❯
+                </Button>
+
             </ButtonsGroup>
 
         </Pagination>
@@ -91,45 +92,43 @@ const ButtonsGroup = styled.div`
 `
 
 const Button = styled.button`
-  background: white;
-  font-size: 1.2rem;
-  line-height: 0;
-  text-align: center;
-  width: 3rem;
-  height: 3rem;
-  /* padding: 1rem; */
-  border: 1px solid black;
-  border-radius: 10px;
-  cursor: pointer;
-  user-select: none;
+    position: relative;
+    background: white;
+    font-size: 1.2rem;
+    line-height: 0;
+    text-align: center;
+    width: 3rem;
+    height: 3rem;
+    border: none;
+    cursor: pointer;
+    user-select: none;
 
-  transition: 0.1s;
-  &:hover{
-    transform: scale(1.1);
-  }
+    &:after{
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        bottom: 0;
+        background-color: #257ae8;
+        width: 0%;
+        height: 2px;
+        transition: 0.1s;
+    }
+
+    transition: 0.1s;
+    &:hover{
+        &:after{
+            width: 100%;
+        }
+    }
 `
 
 const ActivePageButton = styled(Button)`
-    border: 2px orange solid;
     cursor: default;
-    &:hover{
-        transform: none;
+    &:after{
+        width: 100%;
     }
-`
-
-const DirectionButton = styled(Button)`
-    background-color: orange;
-    width: 6rem;
-
-    &:disabled{
-        background-color: gray;
-
-        &:hover{
-            transform: none;
-            cursor: default;
-        }
-    }
-
 `
 
 const Pagination = styled.div`

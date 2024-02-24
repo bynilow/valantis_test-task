@@ -9,7 +9,7 @@ const Loading: FC<ILoadingProps> = ({}) => {
 
     return (  
         <Block>
-
+            
         </Block>
     );
 }

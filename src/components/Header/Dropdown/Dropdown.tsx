@@ -59,6 +59,7 @@ const Arrow = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: center;
+    color: #b3b3b3;
 `
 
 interface IOptionProps{
@@ -85,11 +86,12 @@ const List = styled.div`
     left: 0;
     width: fit-content; 
     height: 50vh;
-    border-radius: 5px;
+    border-radius: 10px;
     display: flex;
     flex-direction: column;
     gap: 3px;
     background-color: #cdcdcd;
+    box-shadow: 0 0 5px black;
     padding: 3px;
     overflow-x: hidden;
     overflow-y: scroll;
@@ -112,12 +114,12 @@ const List = styled.div`
 const Button = styled.button`
     width: 15rem;
     background-color: white;
-    border: 1px solid black;
-    border-radius: 5px;
+    border: 2px solid #b3b3b3;
+    border-radius: 10px;
     font-size: 1rem;
     text-align: left;
     padding: 0.5rem;
-
+    height: 2.5rem;
     
 `
 
@@ -125,7 +127,7 @@ const Block = styled.div`
     position: relative;
     width: fit-content;
     transition: 0.3s;
-
+    height: 2.5rem;
     &:hover ${List}{
         clip-path: circle(130% at 50% 0);
     }

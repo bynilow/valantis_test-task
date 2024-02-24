@@ -1,45 +1,18 @@
 import axios from "axios";
+import { fetchAllUniqueProductsId, fetchProductsData, fetchProductsIdWithFilter, fetchUniqueProductIds } from "../../api/fetchProducts";
 import { AppDispatch } from "../store";
 import { productSlice } from "./ProductSlice";
-import { IProduct } from "../../models/IProduct";
-import axiosRetry from "axios-retry";
-
-axiosRetry(axios, {retries: 3});
-axiosRetry(axios, { 
-    retryDelay: axiosRetry.exponentialDelay,
-    retryCondition: (error) => {
-        if(error.response === undefined){
-
-        }
-        return true;
-    }
-});
-
-var md5 = require('md5');
-
-const timestamp = new Date().toISOString().split('T')[0].split('-').join('');
-const md = md5(`Valantis_${timestamp}`);
-axios.defaults.headers.post['X-Auth'] = md;
-
-console.log(md)
 
 export const fetchAllProductsIdAC = () => async (dispatch: AppDispatch) => {
     try {
         dispatch(productSlice.actions.setIsLoading(true));
 
-        const responseIds = await axios.post('http://api.valantis.store:40000/', {
-            "action": "get_ids"
-        });
-        const data: string[] = responseIds.data.result;
-        const setted = Array.from(new Set(data));
-        dispatch(productSlice.actions.setAllProductsId(setted));
-        dispatch(productSlice.actions.setSearchedProductsId(setted));
+        const idsProducts = await fetchAllUniqueProductsId();
+        dispatch(productSlice.actions.setAllProductsId(idsProducts));
+        dispatch(productSlice.actions.setSearchedProductsId(idsProducts));
 
-        const responseProducts = await axios.post('http://api.valantis.store:40000/', {
-            "action": "get_items",
-            "params": { "ids": setted.slice(0, 50) }
-        })
-        dispatch(productSlice.actions.setProducts(responseProducts.data.result))
+        const dataProducts = await fetchProductsData(idsProducts.slice(0, 50));
+        dispatch(productSlice.actions.setProducts(dataProducts))
 
         dispatch(productSlice.actions.setIsLoading(false));
     }
@@ -53,14 +26,11 @@ export const fetchAllProductsIdAC = () => async (dispatch: AppDispatch) => {
 export const fetchProductsAC = (ids: string[]) => async (dispatch: AppDispatch) => {
     try {
         dispatch(productSlice.actions.setIsLoading(true));
-        const responseProducts = await axios.post('http://api.valantis.store:40000/', {
-            "action": "get_items",
-            "params": {"ids": ids}
-        });
-        const products: IProduct[] = responseProducts.data.result;
-        console.log(products)
 
-        await dispatch(productSlice.actions.setProducts(products));
+        await dispatch(productSlice.actions.setProducts([]));
+        const dataProducts = await fetchProductsData(ids);
+        await dispatch(productSlice.actions.setProducts(dataProducts));
+
         dispatch(productSlice.actions.setIsLoading(false));
     }
     catch (e: any) {
@@ -70,70 +40,67 @@ export const fetchProductsAC = (ids: string[]) => async (dispatch: AppDispatch) 
     }
 }
 
-
-export const fetchProductsIdWithNameAC = (name: string, offset: number, limit: number) => async (dispatch: AppDispatch) => {
+export const fetchProductsIdWithFiltersAC = (price: string, brand: string, name: string) => async (dispatch: AppDispatch) => {
     try {
         dispatch(productSlice.actions.setIsLoading(true));
-
-        if(name.trim() !== ''){
-            const responseIds = await axios.post('http://api.valantis.store:40000/', {
-                "action": "filter",
-                "params": {
-                    "product": name.toLowerCase().trim()
-                }
-            });
-            const data: string[] = responseIds.data.result;
-            const setted = Array.from(new Set(data));
-            dispatch(productSlice.actions.setSearchedProductsId(setted));
-    
-            const spliced = await [...setted].splice(offset, offset + limit);
-            const responseProducts = await axios.post('http://api.valantis.store:40000/', {
-                "action": "get_items",
-                "params": { "ids": spliced }
-            })
-            await dispatch(productSlice.actions.setProducts(responseProducts.data.result));
+        console.log(price.trim(), brand, name.trim())
+        if(price.trim() === '' && brand === 'All' && name.trim() === ''){
+            dispatch(productSlice.actions.setupSearchedProductsIdFromStore());
+            const responseIds = await fetchUniqueProductIds(0, 50);
+            dispatch(fetchProductsAC(responseIds));
         }
         else{
-            dispatch(productSlice.actions.setupSearchedProductsIdFromStore());
-        }
-        
-        dispatch(productSlice.actions.setIsLoading(false));
-        dispatch(setPageAC(0));
-
-    }
-    catch (e: any) {
-        dispatch(productSlice.actions.setIsLoading(false));
-        dispatch(productSlice.actions.setError(e.message));
-        console.error(e);
-    }
-}
-
-export const fetchProductsIdWithBrandAC = (brand: string, offset: number, limit: number) => async (dispatch: AppDispatch) => {
-    try {
-        dispatch(productSlice.actions.setIsLoading(true));
-        if(brand !== 'All'){
-            const responseIds = await axios.post('http://api.valantis.store:40000/', {
-                "action": "filter",
-                "params": {
-                    "brand": brand
-                }
-            });
-            const data: string[] = responseIds.data.result;
-            const setted = Array.from(new Set(data));
-            dispatch(productSlice.actions.setSearchedProductsId(setted));
+            let idsPrice: string[] = [];
+            let idsBrand: string[] = [];
+            let idsName: string[] = [];
     
-            const spliced = await [...setted].splice(offset, offset + limit);
-            const responseProducts = await axios.post('http://api.valantis.store:40000/', {
-                "action": "get_items",
-                "params": { "ids": spliced }
-            })
-            await dispatch(productSlice.actions.setProducts(responseProducts.data.result));
+            if (price !== '' && parseInt(price)){
+                const responsePrice = await fetchProductsIdWithFilter({
+                    filter: 'price',
+                    value: parseInt(price)
+                });
+    
+                idsPrice = [...responsePrice];
+            }
+            if(brand.trim() !== 'All'){
+                const responseBrand = await fetchProductsIdWithFilter({
+                    filter: 'brand',
+                    value: brand.trim()
+                });
+    
+                idsBrand = [...responseBrand];
+            }
+            if(name.trim() !== ''){
+                const responseName = await fetchProductsIdWithFilter({
+                    filter: 'product',
+                    value: name.trim()
+                });
+    
+                idsName = [...responseName];
+            }
+            let ids:string[] = [];
+            if(idsName.length){
+                ids = idsName
+                    .filter(id => idsBrand.length ? idsBrand.includes(id) : true)
+                        .filter(id => idsPrice.length ? idsPrice.includes(id) : true);
+            }
+            if(idsBrand.length){
+                ids = idsBrand
+                    .filter(id => idsName.length ? idsName.includes(id) : true)
+                        .filter(id => idsPrice.length ? idsPrice.includes(id) : true);
+            }
+            if(idsPrice.length){
+                ids = idsPrice
+                    .filter(id => idsBrand.length ? idsBrand.includes(id) : true)
+                        .filter(id => idsName.length ? idsName.includes(id) : true);
+            }    
+            const spliced = [...ids].splice(0, 50)
+            console.log(spliced)
+            dispatch(productSlice.actions.setSearchedProductsId(ids));
+    
+            dispatch(fetchProductsAC(spliced));
         }
-        else{
-            dispatch(productSlice.actions.setupSearchedProductsIdFromStore());
-        }
-        
-        dispatch(productSlice.actions.setIsLoading(false));
+
         dispatch(setPageAC(0));
 
     }

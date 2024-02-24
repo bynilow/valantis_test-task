@@ -1,3 +1,4 @@
+import { FC } from 'react';
 import styled from 'styled-components'
 
 interface IProductCardProps {
@@ -7,9 +8,10 @@ interface IProductCardProps {
     price: number;
 }
 
-function ProductCard({id, product, brand, price}: IProductCardProps) {
 
-    return (  
+const ProductCard: FC<IProductCardProps> = ({id, product, brand, price}) => {
+
+    return (
         <Card>
             <Image />
             <Id>
@@ -22,11 +24,18 @@ function ProductCard({id, product, brand, price}: IProductCardProps) {
                 {brand}
             </Brand>
             <Cost>
-                {price} Р
+                {
+                    price.toLocaleString('ru', {
+                        style: 'currency',
+                        currency: 'rub',
+                        minimumFractionDigits: 0
+                    })
+                }
             </Cost>
         </Card>
     );
 }
+
 
 const Image = styled.div`
     width: 100%;
@@ -84,7 +93,7 @@ const Card = styled.div`
     padding: 10px;
     border: 1px solid black;
     border-radius: 10px;
-    width: 20rem;
+    width: 100%;
     height: 26rem;
     display: flex;
     flex-direction: column;

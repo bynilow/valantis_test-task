@@ -1,10 +1,11 @@
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
+import { fetchAllBrandsAC, fetchAllProductsIdAC, fetchProductsAC } from '../../store/reducers/ActionCreator';
 import ProductCard from '../Cards/ProductCard';
-import PaginationButtons from '../Pagination/PaginationButtons';
-import { fetchAllBrandsAC, fetchAllProductsIdAC, fetchProductsAC, setPageAC } from '../../store/reducers/ActionCreator';
 import Loading from '../Loading/Loading';
+import PaginationButtons from '../Pagination/PaginationButtons';
+import EmptyProductCard from '../Cards/EmptyProductCard';
 
 interface IMainProps {
 
@@ -12,14 +13,14 @@ interface IMainProps {
 
 const Main: FC<IMainProps> = ({ }) => {
     const dispatch = useAppDispatch();
-    const { allProductsId, searchedProductsId, products, isLoading, pageNumber, error } = useAppSelector(state => state.productReducer);
+    const { searchedProductsId, products, isLoading, pageNumber, error } = useAppSelector(state => state.productReducer);
 
     const isFirstMountRef = useRef(true);
     useEffect(() => {
         if (isFirstMountRef.current) {
             isFirstMountRef.current = false
         }
-        else {
+        else if(!isLoading){
             dispatch(fetchProductsAC(searchedProductsId.slice(pageNumber * 50, pageNumber * 50 + 50)));
         }
 
@@ -38,7 +39,7 @@ const Main: FC<IMainProps> = ({ }) => {
                 error && <h1>Ошибка: {error}</h1>
             }
             {
-                isLoading
+                isLoading 
                     ? <Loading />
                     : <>
                         <List>
@@ -64,15 +65,14 @@ const Main: FC<IMainProps> = ({ }) => {
 
 
 const List = styled.div`
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
     gap: 10px;
-    flex-wrap: wrap;
     border: 1px solid black;
     border-radius: 10px;
-    height: fit-content;
     width: 100%;
     padding: 1rem;
+    
 `
 
 const MainBlock = styled.main`
@@ -81,7 +81,6 @@ const MainBlock = styled.main`
     align-items: center;
     gap: 20px;
     width: 100%;
-    height: 100%;
     margin-top: 5rem;
 `
 
