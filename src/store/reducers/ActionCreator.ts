@@ -53,9 +53,7 @@ export const fetchAllProductsIdAC = () => async (dispatch: AppDispatch) => {
 export const fetchProductsAC = (ids: string[]) => async (dispatch: AppDispatch) => {
     try {
         dispatch(productSlice.actions.setIsLoading(true));
-
         const responseProducts = await axios.post('http://api.valantis.store:40000/', {
-            "axios-retry": {retries: 3},
             "action": "get_items",
             "params": {"ids": ids}
         });
@@ -84,7 +82,6 @@ export const fetchProductsIdWithNameAC = (name: string, offset: number, limit: n
                     "product": name.toLowerCase().trim()
                 }
             });
-    
             const data: string[] = responseIds.data.result;
             const setted = Array.from(new Set(data));
             dispatch(productSlice.actions.setSearchedProductsId(setted));
@@ -94,9 +91,42 @@ export const fetchProductsIdWithNameAC = (name: string, offset: number, limit: n
                 "action": "get_items",
                 "params": { "ids": spliced }
             })
+            await dispatch(productSlice.actions.setProducts(responseProducts.data.result));
+        }
+        else{
+            dispatch(productSlice.actions.setupSearchedProductsIdFromStore());
+        }
+        
+        dispatch(productSlice.actions.setIsLoading(false));
+        dispatch(setPageAC(0));
+
+    }
+    catch (e: any) {
+        dispatch(productSlice.actions.setIsLoading(false));
+        dispatch(productSlice.actions.setError(e.message));
+        console.error(e);
+    }
+}
+
+export const fetchProductsIdWithBrandAC = (brand: string, offset: number, limit: number) => async (dispatch: AppDispatch) => {
+    try {
+        dispatch(productSlice.actions.setIsLoading(true));
+        if(brand !== 'All'){
+            const responseIds = await axios.post('http://api.valantis.store:40000/', {
+                "action": "filter",
+                "params": {
+                    "brand": brand
+                }
+            });
+            const data: string[] = responseIds.data.result;
+            const setted = Array.from(new Set(data));
+            dispatch(productSlice.actions.setSearchedProductsId(setted));
     
-            console.log('responseProducts', responseProducts)
-    
+            const spliced = await [...setted].splice(offset, offset + limit);
+            const responseProducts = await axios.post('http://api.valantis.store:40000/', {
+                "action": "get_items",
+                "params": { "ids": spliced }
+            })
             await dispatch(productSlice.actions.setProducts(responseProducts.data.result));
         }
         else{
@@ -127,7 +157,6 @@ export const setPageAC = (page: number) => async (dispatch: AppDispatch) => {
 export const fetchAllBrandsAC = () => async (dispatch: AppDispatch) => {
     try {
         const responseBrands = await axios.post('http://api.valantis.store:40000/', {
-            "axios-retry": {retries: 3},
             "action": "get_fields",
             "params": {"field": "brand"}
         });

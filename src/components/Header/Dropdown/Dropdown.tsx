@@ -3,29 +3,36 @@ import styled from 'styled-components'
 
 interface IDropdownProps {
     options: string[];
+    onChangeOption: Function;
 }
 
-const Dropdown: FC<IDropdownProps> = ({options}) => {
+const Dropdown: FC<IDropdownProps> = ({options, onChangeOption}) => {
 
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedValue, setSelectedValue] = useState('Все');
+    const [selectedValue, setSelectedValue] = useState('All');
 
     const onSelect = (value: string) => {
         setSelectedValue(value);
-        if(value !== 'Все') setIsOpen(false);
+        onChangeOption(value);
+        if(value !== 'All') setIsOpen(false);
     }
 
     return (  
         <Block onMouseLeave={() => setIsOpen(false)}>
+            <Arrow>
+                ▼
+            </Arrow>
             <Button onMouseEnter={() => setIsOpen(true)} onClick={() => setIsOpen(true)}>
-                {selectedValue}
+                {
+                    selectedValue === 'All' ? 'Все' : selectedValue
+                }
             </Button>
             {
-                isOpen &&
+                true &&
                 <List>
                     <Option
-                        isSelected={'Все' === selectedValue}
-                        onClick={() => onSelect('Все')}>
+                        isSelected={'All' === selectedValue}
+                        onClick={() => onSelect('All')}>
                         Все
                     </Option>
                     {
@@ -42,6 +49,17 @@ const Dropdown: FC<IDropdownProps> = ({options}) => {
         </Block>
     );
 }
+
+const Arrow = styled.div`
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin-right: 10px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+`
 
 interface IOptionProps{
     isSelected: boolean;
@@ -75,6 +93,9 @@ const List = styled.div`
     padding: 3px;
     overflow-x: hidden;
     overflow-y: scroll;
+    clip-path: circle(0% at 50% 0);
+
+    transition: 0.3s;
 
     &::-webkit-scrollbar {
         width: 5px;
@@ -96,11 +117,18 @@ const Button = styled.button`
     font-size: 1rem;
     text-align: left;
     padding: 0.5rem;
+
+    
 `
 
 const Block = styled.div`
     position: relative;
     width: fit-content;
+    transition: 0.3s;
+
+    &:hover ${List}{
+        clip-path: circle(130% at 50% 0);
+    }
 `
 
 export default Dropdown;

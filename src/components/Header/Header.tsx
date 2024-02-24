@@ -1,7 +1,7 @@
 import { FC, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
-import { fetchProductsIdWithNameAC } from '../../store/reducers/ActionCreator';
+import { fetchProductsIdWithBrandAC, fetchProductsIdWithNameAC } from '../../store/reducers/ActionCreator';
 import Container from '../Container/Container';
 import { useDebounce } from '../../hooks/react';
 import Dropdown from './Dropdown/Dropdown';
@@ -19,8 +19,8 @@ const Header: FC<IHeaderProps> = ({}) => {
     const [nameValue, setNameValue] = useState('');
     const debouncedName = useDebounce(nameValue, 1500);
 
-    const [brandValue, setBrandValue] = useState('');
-    const debouncedBrand = useDebounce(brandValue, 1500);
+    const [brandValue, setBrandValue] = useState('All');
+    const debouncedBrand = useDebounce(brandValue, 500);
 
     const [costValue, setCostValue] = useState('');
     const debouncedCost = useDebounce(costValue, 1500);
@@ -28,8 +28,8 @@ const Header: FC<IHeaderProps> = ({}) => {
     const onChangeName = (e: React.ChangeEvent<HTMLInputElement> ) => {
         setNameValue(e.target.value);
     }
-    const onChangeBrand = (e: React.ChangeEvent<HTMLInputElement> ) => {
-        setBrandValue(e.target.value);
+    const onChangeBrand = (brand: string) => {
+        setBrandValue(brand);
     }
     const onChangeCost = (e: React.ChangeEvent<HTMLInputElement> ) => {
         setCostValue(e.target.value);
@@ -44,6 +44,11 @@ const Header: FC<IHeaderProps> = ({}) => {
             dispatch(fetchProductsIdWithNameAC(debouncedName.toString(), pageNumber*50, 50));
         }
     }, [debouncedName])
+    useEffect(() => {
+        if(!isFirstMountRef.current){
+            dispatch(fetchProductsIdWithBrandAC(debouncedBrand.toString(), pageNumber*50, 50));
+        }
+    }, [debouncedBrand])
 
     return (  
         <HeaderBlock>
@@ -57,7 +62,9 @@ const Header: FC<IHeaderProps> = ({}) => {
                             value={nameValue} 
                             onChange={(e) => onChangeName(e)} />
                     </Label>
-                    <Dropdown options={allBrands} />
+                    <Dropdown 
+                        onChangeOption={(brand:string) => onChangeBrand(brand)}
+                        options={allBrands} />
                     <Label>
                         Цена
                         <Input
