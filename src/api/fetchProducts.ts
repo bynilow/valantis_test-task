@@ -16,8 +16,10 @@ const timestamp = new Date().toISOString().split('T')[0].split('-').join('');
 const md = md5(`Valantis_${timestamp}`);
 axios.defaults.headers.post['X-Auth'] = md;
 
+const URL = 'https://api.valantis.store:41000/';
+
 export const fetchAllUniqueIds = async () => {
-    const responseIds = await axios.post('http://api.valantis.store:40000/', {
+    const responseIds = await axios.post(URL, {
         "action": "get_ids"
     });
     const data: string[] = responseIds.data.result;
@@ -26,7 +28,7 @@ export const fetchAllUniqueIds = async () => {
 }
 
 export const fetchUniqueIds = async (offset: number, limit: number) => {
-    const responseIds = await axios.post('http://api.valantis.store:40000/', {
+    const responseIds = await axios.post(URL, {
         "action": "get_ids",
         "params": {
             "offset": offset,
@@ -45,7 +47,7 @@ export const fetchProductsData = async (ids: string[]) => {
         return JSON.parse(cachedProducts);
     } 
 
-    const responseProducts = await axios.post('http://api.valantis.store:40000/', {
+    const responseProducts = await axios.post(URL, {
         "action": "get_items",
         "params": { "ids": ids }
     })
@@ -76,7 +78,7 @@ export const fetchIdsWithFilter = async ({filter, value}:Filter) => {
         return JSON.parse(cachedIds);
     } 
 
-    const responseIds = await axios.post('http://api.valantis.store:40000/', {
+    const responseIds = await axios.post(URL, {
         "action": "filter",
         "params": {
             [filter]: value
