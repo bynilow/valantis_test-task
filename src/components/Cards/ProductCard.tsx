@@ -58,7 +58,6 @@ const Cost = styled.p`
     position: relative;
     font-size: 1rem;
     color: ${palette.green};
-    margin-top: 10px;
     align-self: flex-end;
     cursor: pointer;
 
@@ -87,7 +86,6 @@ const Brand = styled.p`
 
 const Name = styled.p`
     font-size: 1rem;
-    line-height: 1;
 `
 
 const Id = styled.p`
@@ -100,11 +98,11 @@ const Id = styled.p`
 
 const Card = styled.div`
     position: relative;
-    padding: 15px;
+    padding: 10px;
     box-shadow: 0 0 5px #0000002f;
     border-radius: 10px; 
     width: 100%;
-    height: 26rem;
+    min-height: 25rem;
     display: flex;
     justify-content: space-between;
     flex-direction: column;

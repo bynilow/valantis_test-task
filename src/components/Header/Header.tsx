@@ -1,12 +1,11 @@
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useState } from 'react';
 import styled from 'styled-components';
-import { useDebounce } from '../../hooks/react';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
-import { fetchProductsIdWithFiltersAC, setSearchedProductsIdFromStoreAC } from '../../store/reducers/ActionCreator';
+import { fetchIdsWithFiltersAC, setSearchedProductsIdFromStoreAC } from '../../store/reducers/ActionCreator';
 import Container from '../Container/Container';
+import ButtonSearch from './Buttons/ButtonSearch';
 import Dropdown from './Dropdown/Dropdown';
 import Input from './Inputs/Input';
-import ButtonSearch from './Buttons/ButtonSearch';
 
 interface IHeaderProps {
 
@@ -14,7 +13,7 @@ interface IHeaderProps {
 
 const Header: FC<IHeaderProps> = ({ }) => {
 
-    const { pageNumber, allBrands, isLoading } = useAppSelector(state => state.productReducer)
+    const { allBrands, isLoading } = useAppSelector(state => state.productReducer)
 
     const dispatch = useAppDispatch();
 
@@ -24,18 +23,18 @@ const Header: FC<IHeaderProps> = ({ }) => {
 
     const [priceValue, setPriceValue] = useState('');
 
-    
+
     const onChangeBrand = (brand: string) => {
         setBrandValue(brand);
     }
 
     const onClickSearch = () => {
         if (nameValue.trim() || brandValue !== 'All' || priceValue.trim()) {
-            dispatch(fetchProductsIdWithFiltersAC(
+            dispatch(fetchIdsWithFiltersAC(
                 priceValue, brandValue, nameValue
             ));
         }
-        else if(!isLoading){
+        else if (!isLoading) {
             dispatch(setSearchedProductsIdFromStoreAC())
         }
     }
@@ -43,7 +42,6 @@ const Header: FC<IHeaderProps> = ({ }) => {
     return (
         <HeaderBlock>
             <Container>
-
                 <HeaderInner>
                     <Logo>
                         VALANTIS
@@ -75,21 +73,45 @@ const Header: FC<IHeaderProps> = ({ }) => {
 const Logo = styled.div`
     font-weight: 100;
     font-size: 2rem;
+
+    @media (max-width: 480px) {
+        display: none;
+    }
 `
 
 const SearchBlock = styled.div`
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(8rem, 1fr)) auto;
     gap: 10px;
+    width: 60%;
+
+    @media (max-width: 979px) {
+        width: 80%;
+    }
+    @media (max-width: 768px) {
+        width: 100%;
+    }
+    @media (max-width: 480px) {
+        display: flex;
+        flex-wrap: wrap;
+        
+    }
+    
 `
 
 const HeaderInner = styled.div`
     width: 100%;
     height: 100%;
-    
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 15px;
+
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        justify-content: center;
+    }
 `
 
 const HeaderBlock = styled.header`
@@ -103,6 +125,13 @@ const HeaderBlock = styled.header`
     z-index: 10;
     display: flex;
     justify-content: center;
+
+    @media (max-width: 768px) {
+        height: 8rem;
+    }
+    @media (max-width: 480px) {
+        height: 7rem;
+    }
 `
 
 export default Header;

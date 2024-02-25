@@ -1,11 +1,13 @@
 import { FC, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
-import { fetchAllBrandsAC, fetchAllProductIdsAC, fetchProductsAC } from '../../store/reducers/ActionCreator';
+import { fetchAllBrandsAC, fetchAllIdsAC, fetchProductsAC } from '../../store/reducers/ActionCreator';
 import ProductCard from '../Cards/ProductCard';
 import Loading from '../Loading/Loader';
 import PaginationButtons from '../Pagination/PaginationButtons';
 import { palette } from '../../styles/style';
+import Container from '../Container/Container';
+import { getNountText } from '../../functions/getNounText';
 
 interface IMainProps {
 
@@ -23,104 +25,173 @@ const Main: FC<IMainProps> = ({ }) => {
         else if (!isLoading) {
             dispatch(fetchProductsAC(searchedProductsId.slice(pageNumber * 50, pageNumber * 50 + 50)));
         }
-
     }, [pageNumber]);
 
     useEffect(() => {
-        dispatch(fetchAllProductIdsAC());
+        dispatch(fetchAllIdsAC());
         dispatch(fetchAllBrandsAC());
     }, [])
 
     return (
         <MainBlock>
-            <Title>
-                Ювелирные украшения {
-                    searchedProductsId.length
-                        ? <CountProducts>{searchedProductsId.length.toLocaleString('ru')} товаров</CountProducts>
-                        : null
-                }
-            </Title>
-
-            {
-                searchedProductsId.length && !isLoading 
-                    ? <PaginationButtons /> 
-                    : null
-            }
-
-            {
-                error && <h1>Ошибка: {error}</h1>
-            }
-
-            {
-                (!isLoading && !searchedProductsId.length)
-                    ? <NotFound>
-                        Ничего не найдено
-                    </NotFound>
-                    : null
-            }
-
-            {
-                isLoading && !error
-                    ? <Loading />
-                    : <List>
+            <Container>
+                <ContainerInner>
+                    <InfoPage>
+                        <Title>
+                            Ювелирные украшения
+                        </Title>
                         {
-                            products.length
-                                ? products.map(product => <ProductCard
-                                    key={product.id}
-                                    id={product.id}
-                                    brand={product.brand}
-                                    price={product.price}
-                                    product={product.product} />)
+                            searchedProductsId.length && !error
+                                ? <CountProducts>
+                                    {searchedProductsId.length.toLocaleString('ru')} {
+                                        getNountText({
+                                            number: searchedProductsId.length,
+                                            one: 'товар',
+                                            two: 'товара',
+                                            five: 'товаров'
+                                        })
+                                    }
+                                </CountProducts>
                                 : null
                         }
-                    </List>
-            }
+                    </InfoPage>
 
-            {
-                searchedProductsId.length && !isLoading 
-                    ? <PaginationButtons /> 
-                    : null
-            }
+                    {
+                        error && <>
+                            <Error>Произошла ошибка.</Error>
+                            <ErrorMessage>{error}</ErrorMessage>
+                        </>
+                    }
 
+                    {
+                        !isLoading && !error && !searchedProductsId.length
+                            ? <NotFound>
+                                Ничего не найдено
+                            </NotFound>
+                            : null
+                    }
 
+                    {
+                        searchedProductsId.length > 50 && !error
+                            ? <PaginationOuter>
+                                <PaginationButtons />
+                            </PaginationOuter>
+                            : null
+                    }
+
+                    {
+                        isLoading && !error
+                            ? <Loading />
+                            : <List>
+                                {
+                                    products.length
+                                        ? products.map(product => <ProductCard
+                                            key={product.id}
+                                            id={product.id}
+                                            brand={product.brand}
+                                            price={product.price}
+                                            product={product.product} />)
+                                        : null
+                                }
+                            </List>
+                    }
+
+                    {
+                        searchedProductsId.length > 50 && !error && !isLoading
+                            ? <PaginationOuter>
+                                <PaginationButtons />
+                            </PaginationOuter>
+                            : null
+                    }
+                </ContainerInner>
+            </Container>
         </MainBlock>
     );
 }
 
-const NotFound = styled.div`
+const InfoPage = styled.div`
+    align-self: flex-start;
+    @media (max-width: 768px) {
+        align-self: center;
+        text-align: center;
+    }
+`
+
+const PaginationOuter = styled.div`
+    width: 100%;
+
+    @media (max-width: 768px) {
+        display: flex;
+        justify-content: center;
+    }
+`
+
+const ErrorMessage = styled.p`
+    font-size: 1rem;
+    color: red;
+`
+
+const Error = styled.p`
     font-size: 2rem;
     width: 100%;
 `
 
-const CountProducts = styled.span`
-    height: 100%;
-    font-size: 0.7rem;
+const NotFound = styled.div`
+    font-size: 2rem;
+    width: 100%;
+
+    @media (max-width: 768px) {
+        text-align: center;
+    }
+`
+
+const CountProducts = styled.p`
+    font-size: 1rem;
     font-weight: lighter;
     color: ${palette.darkGray};
 `
 
 const Title = styled.h1`
     font-size: 3rem;
-    display: flex;
-    gap: 10px;
-    align-items: center;
+
+    @media (max-width: 768px) {
+        font-size: 2rem;
+        width: 100%;
+        text-align: center;
+    }
 `
 
 const List = styled.div`
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
     gap: 15px;
     border-radius: 10px;
     width: 100%;    
 `
 
+const ContainerInner = styled.div`
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+`
+
 const MainBlock = styled.main`
     display: flex;
     flex-direction: column;
-    align-items: start;
+    align-items: center;
     gap: 20px;
     width: 100%;
     margin-top: 5rem;
+    margin-bottom: 2rem;
+
+    @media (max-width: 768px) {
+        margin-top: 9rem;
+    }
+    @media (max-width: 480px) {
+        margin-top: 8rem;
+    }
 `
 
 export default Main;

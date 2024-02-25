@@ -5,7 +5,7 @@ import { AppDispatch } from "../store";
 import { productSlice } from "./ProductSlice";
 import { getUniqueProducts } from '../../functions/getUniqueProducts';
 
-export const fetchAllProductIdsAC = () => async (dispatch: AppDispatch) => {
+export const fetchAllIdsAC = () => async (dispatch: AppDispatch) => {
     try {
         dispatch(productSlice.actions.setIsLoading(true));
 
@@ -46,7 +46,7 @@ export const fetchProductsAC = (ids: string[]) => async (dispatch: AppDispatch) 
     }
 }
 
-export const fetchProductsIdWithFiltersAC = (price: string, brand: string, name: string) => async (dispatch: AppDispatch) => {
+export const fetchIdsWithFiltersAC = (price: string, brand: string, name: string) => async (dispatch: AppDispatch) => {
     try {
         dispatch(productSlice.actions.setIsLoading(true));
         console.log(price.trim(), brand, name.trim())
@@ -60,10 +60,10 @@ export const fetchProductsIdWithFiltersAC = (price: string, brand: string, name:
             let idsBrand: string[] = [];
             let idsName: string[] = [];
     
-            if (price !== '' && parseInt(price)){
+            if (price !== '' && parseInt(price.replace(/\s/g,''))){
                 const responsePrice = await fetchProductsIdWithFilter({
                     filter: 'price',
-                    value: parseInt(price)
+                    value: parseInt(price.replace(/\s/g,''))
                 });
     
                 idsPrice = [...responsePrice];
@@ -79,30 +79,20 @@ export const fetchProductsIdWithFiltersAC = (price: string, brand: string, name:
             if(name.trim() !== ''){
                 const responseName = await fetchProductsIdWithFilter({
                     filter: 'product',
-                    value: name.trim()
+                    value: name.toLocaleLowerCase().trim()
                 });
     
                 idsName = [...responseName];
             }
             let ids:string[] = [];
-            if(idsName.length){
-                ids = idsName
+            ids = [...idsName, ...idsBrand, ...idsPrice]
+                .filter(id => idsName.length || name.trim() ? idsName.includes(id) : true)
                     .filter(id => idsBrand.length ? idsBrand.includes(id) : true)
-                        .filter(id => idsPrice.length ? idsPrice.includes(id) : true);
-            }
-            if(idsBrand.length){
-                ids = idsBrand
-                    .filter(id => idsName.length ? idsName.includes(id) : true)
-                        .filter(id => idsPrice.length ? idsPrice.includes(id) : true);
-            }
-            if(idsPrice.length){
-                ids = idsPrice
-                    .filter(id => idsBrand.length ? idsBrand.includes(id) : true)
-                        .filter(id => idsName.length ? idsName.includes(id) : true);
-            }    
+                        .filter(id => idsPrice.length ? idsPrice.includes(id) : true)
+                        
             const spliced = [...ids].splice(0, 50)
             console.log(spliced)
-            dispatch(productSlice.actions.setSearchedProductsId(ids));
+            dispatch(productSlice.actions.setSearchedProductsId(Array.from(new Set(ids))));
     
             dispatch(fetchProductsAC(spliced));
         }

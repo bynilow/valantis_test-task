@@ -18,7 +18,7 @@ const ButtonSearch: FC<IButtonSearchProps> = ({onClick}) => {
 }
 
 const Image = styled.img`
-    height: 100%;
+    min-width: 100%;
     aspect-ratio: 1/1;
     filter: contrast(0%);
 `
@@ -30,8 +30,8 @@ const Button = styled.button`
     border: 2px solid ${palette.darkGray};
     border-radius: 10px;
     font-size: 1rem;
-    padding: 0.5rem;
-    height: 2.5rem;
+    padding: 10px;
+    max-width: 2.5rem;
     cursor: pointer;
     transition: 0.1s;
 

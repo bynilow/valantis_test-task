@@ -117,6 +117,12 @@ const Button = styled.button`
             width: 100%;
         }
     }
+
+    @media (max-width: 480px) {
+        font-size: 1rem;
+        width: 2.5rem;
+        height: 2.5rem;
+    }
 `
 
 const ActivePageButton = styled(Button)`
@@ -129,6 +135,7 @@ const ActivePageButton = styled(Button)`
 const Pagination = styled.div`
     display: flex;
     gap: 10px;
+    
     
 `
 

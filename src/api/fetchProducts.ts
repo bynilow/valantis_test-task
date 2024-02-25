@@ -73,6 +73,7 @@ interface INameFilter {
 type Filter = INameFilter | IBrandFilter | IPriceFilter;
 
 export const fetchProductsIdWithFilter = async ({filter, value}:Filter) => { 
+    console.log(`${filter}: ${value}`)
     const cachedIds = sessionStorage.getItem(`${filter}: ${value}`);
     if(cachedIds){
         return JSON.parse(cachedIds);

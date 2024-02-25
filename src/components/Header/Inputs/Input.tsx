@@ -20,6 +20,9 @@ const Input: FC<IInputProps> = ({onChange, type, placeholder}) => {
             targetValue = targetValue.trim() !== ''
                 ? Number(targetValue).toLocaleString('ru')
                 : targetValue
+            targetValue = targetValue === '0' 
+                ? '' 
+                : targetValue
         }
         setValue(targetValue);
         onChange(targetValue);
@@ -70,6 +73,7 @@ const InputName = styled.input`
     border: none;
     padding: 0.5rem;
     font-size: 1rem;
+    width: 100%;
     height: 100%;
 
     &:focus{
@@ -89,6 +93,11 @@ const Block = styled.div`
     height: 2.5rem;
 
     transition: 0.2s;
+
+    @media (max-width: 480px) {
+        min-width: 40%;
+        flex: 1;
+    }
 
     &:has(${InputName}:focus){
         border: 2px solid ${palette.accentColor}; 

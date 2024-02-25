@@ -1,5 +1,4 @@
 import styled, { createGlobalStyle } from 'styled-components';
-import Container from './components/Container/Container';
 import Header from './components/Header/Header';
 import Main from './components/Pages/Main';
 
@@ -9,9 +8,7 @@ function App() {
     <AppBlock>
       <GlobalStyle />
       <Header />
-      <Container>
-        <Main />
-      </Container>
+      <Main />
     </AppBlock>
   );
 }
@@ -25,10 +22,11 @@ const GlobalStyle = createGlobalStyle`
 `
 
 const AppBlock = styled.div`
-  max-width: 100vw;
+  width: 100vw;
   max-height: 100vh;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   overflow-y: auto;
 
   &::-webkit-scrollbar {
@@ -44,7 +42,6 @@ const AppBlock = styled.div`
     background-color: #b3b3b3; 
     border-radius: 3px;
   }
-  
 `
 
 export default App;

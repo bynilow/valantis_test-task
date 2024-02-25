@@ -20,14 +20,14 @@ const Dropdown: FC<IDropdownProps> = ({options, onChangeOption}) => {
 
     return (  
         <Block onMouseLeave={() => setIsOpen(false)}>
-            <Arrow>
-                ▼
-            </Arrow>
             <Button onMouseEnter={() => setIsOpen(true)} onClick={() => setIsOpen(true)}>
                 {
                     selectedValue === 'All' ? 'Все' : selectedValue
                 }
             </Button>
+            <Arrow>
+                ▼
+            </Arrow>
             {
                 true &&
                 <List>
@@ -52,14 +52,11 @@ const Dropdown: FC<IDropdownProps> = ({options, onChangeOption}) => {
 }
 
 const Arrow = styled.div`
-    position: absolute;
-    right: 0;
-    top: 0;
-    margin-right: 10px;
     height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    margin-right: 5px;
     color: ${palette.darkGray};
 `
 
@@ -70,7 +67,6 @@ interface IOptionProps{
 const Option = styled.div<IOptionProps>`
     cursor: pointer;
     white-space: nowrap;
-    width: 15rem;
     padding: 5px;
     transition: 0.1s;
 
@@ -81,15 +77,13 @@ const Option = styled.div<IOptionProps>`
     background-color: ${
         p => p.$isSelected ? `#cbcbcb` : `none`
     };
-
-    
 `
 
 const List = styled.div`
     position: absolute;
     top: 0;
     left: 0;
-    width: fit-content; 
+    width: 100%; 
     height: 50vh;
     border-radius: 10px;
     display: flex;
@@ -101,7 +95,7 @@ const List = styled.div`
     overflow-x: hidden;
     overflow-y: scroll;
     clip-path: circle(0% at 50% 0);
-
+    z-index: 10;
     transition: 0.3s;
 
     &::-webkit-scrollbar {
@@ -117,15 +111,15 @@ const List = styled.div`
 `
 
 const Button = styled.button`
-    width: 15rem;
+    width: 100%;
     background-color: white;
-    border: 2px solid ${palette.darkGray};
+    border: none;
     border-radius: 10px;
     font-size: 1rem;
+    white-space: nowrap;
     text-align: left;
     padding: 0.5rem;
-    height: 2.5rem;
-    
+    overflow: hidden;
 `
 
 const Block = styled.div`
@@ -133,9 +127,22 @@ const Block = styled.div`
     width: fit-content;
     transition: 0.3s;
     height: 2.5rem;
+    width: 100%;
+    background-color: white;
+    border: 2px solid ${palette.darkGray};
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    
     &:hover ${List}{
-        clip-path: circle(130% at 50% 0);
+        clip-path: circle(140% at 50% 0);
     }
+
+    @media (max-width: 480px) {
+        min-width: 50%;
+        flex: 1;
+    }
+
 `
 
 export default Dropdown;
