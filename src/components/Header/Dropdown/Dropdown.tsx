@@ -1,5 +1,6 @@
 import { FC, useState } from 'react';
 import styled from 'styled-components'
+import { palette } from '../../../styles/style';
 
 interface IDropdownProps {
     options: string[];
@@ -31,7 +32,7 @@ const Dropdown: FC<IDropdownProps> = ({options, onChangeOption}) => {
                 true &&
                 <List>
                     <Option
-                        isSelected={'All' === selectedValue}
+                        $isSelected={'All' === selectedValue}
                         onClick={() => onSelect('All')}>
                         Все
                     </Option>
@@ -39,7 +40,7 @@ const Dropdown: FC<IDropdownProps> = ({options, onChangeOption}) => {
                         options.map(option =>
                             <Option
                                 key={option}
-                                isSelected={option === selectedValue}
+                                $isSelected={option === selectedValue}
                                 onClick={() => onSelect(option)}>
                                 {option}
                             </Option>)
@@ -59,25 +60,29 @@ const Arrow = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: center;
-    color: #b3b3b3;
+    color: ${palette.darkGray};
 `
 
 interface IOptionProps{
-    isSelected: boolean;
+    $isSelected: boolean;
 }
 
 const Option = styled.div<IOptionProps>`
     cursor: pointer;
     white-space: nowrap;
     width: 15rem;
-    background-color: white;
-    border-radius: 5px;
     padding: 5px;
     transition: 0.1s;
 
-    ${
-        p => p.isSelected && `border-left: 5px solid orange;`
+    &:hover{
+        background-color: ${p => p.$isSelected ? `#cbcbcb` : `#f2f2f2`}
     }
+
+    background-color: ${
+        p => p.$isSelected ? `#cbcbcb` : `none`
+    };
+
+    
 `
 
 const List = styled.div`
@@ -90,8 +95,8 @@ const List = styled.div`
     display: flex;
     flex-direction: column;
     gap: 3px;
-    background-color: #cdcdcd;
-    box-shadow: 0 0 5px black;
+    background-color: white;
+    box-shadow: 0 0 5px #0000005b;
     padding: 3px;
     overflow-x: hidden;
     overflow-y: scroll;
@@ -103,10 +108,10 @@ const List = styled.div`
         width: 5px;
     }
     &::-webkit-scrollbar-track {
-        background: #cdcdcd;
+        background: ${palette.lightGray};
     }
     &::-webkit-scrollbar-thumb {
-        background-color: gray; 
+        background-color: ${palette.darkGray}; 
         border-radius: 20px;
     }
 `
@@ -114,7 +119,7 @@ const List = styled.div`
 const Button = styled.button`
     width: 15rem;
     background-color: white;
-    border: 2px solid #b3b3b3;
+    border: 2px solid ${palette.darkGray};
     border-radius: 10px;
     font-size: 1rem;
     text-align: left;

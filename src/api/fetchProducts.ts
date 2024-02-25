@@ -1,6 +1,5 @@
 import axios from "axios";
 import axiosRetry from "axios-retry";
-import { IProduct } from "../models/IProduct";
 var md5 = require('md5');
 
 axiosRetry(axios, { retries: 3 });

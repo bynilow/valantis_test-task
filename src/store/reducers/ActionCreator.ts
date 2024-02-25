@@ -1,18 +1,21 @@
+import { IProduct } from './../../models/IProduct';
 import axios from "axios";
 import { fetchAllUniqueProductsId, fetchProductsData, fetchProductsIdWithFilter, fetchUniqueProductIds } from "../../api/fetchProducts";
 import { AppDispatch } from "../store";
 import { productSlice } from "./ProductSlice";
+import { getUniqueProducts } from '../../functions/getUniqueProducts';
 
-export const fetchAllProductsIdAC = () => async (dispatch: AppDispatch) => {
+export const fetchAllProductIdsAC = () => async (dispatch: AppDispatch) => {
     try {
         dispatch(productSlice.actions.setIsLoading(true));
 
         const idsProducts = await fetchAllUniqueProductsId();
-        dispatch(productSlice.actions.setAllProductsId(idsProducts));
-        dispatch(productSlice.actions.setSearchedProductsId(idsProducts));
+        await dispatch(productSlice.actions.setAllProductsId(idsProducts));
+        await dispatch(productSlice.actions.setSearchedProductsId(idsProducts));
+        const dataProducts: IProduct[] = await fetchProductsData([...idsProducts].splice(0,50));
 
-        const dataProducts = await fetchProductsData(idsProducts.slice(0, 50));
-        dispatch(productSlice.actions.setProducts(dataProducts))
+        const uniqueProducts = await getUniqueProducts(dataProducts);
+        dispatch(productSlice.actions.setProducts(uniqueProducts));
 
         dispatch(productSlice.actions.setIsLoading(false));
     }
@@ -28,8 +31,11 @@ export const fetchProductsAC = (ids: string[]) => async (dispatch: AppDispatch) 
         dispatch(productSlice.actions.setIsLoading(true));
 
         await dispatch(productSlice.actions.setProducts([]));
-        const dataProducts = await fetchProductsData(ids);
-        await dispatch(productSlice.actions.setProducts(dataProducts));
+        const sliced = ids.splice(0,50);
+        console.log(sliced)
+        const dataProducts = await fetchProductsData(sliced);
+        const uniqueProducts = await getUniqueProducts(dataProducts);
+        await dispatch(productSlice.actions.setProducts(uniqueProducts));
 
         dispatch(productSlice.actions.setIsLoading(false));
     }
@@ -111,6 +117,25 @@ export const fetchProductsIdWithFiltersAC = (price: string, brand: string, name:
     }
 }
 
+export const setSearchedProductsIdFromStoreAC = () => async (dispatch: AppDispatch) => {
+    try {
+        dispatch(productSlice.actions.setIsLoading(true));
+
+        await dispatch(productSlice.actions.setupSearchedProductsIdFromStore());
+        dispatch(productSlice.actions.setupSearchedProductsIdFromStore());
+        const responseIds = await fetchUniqueProductIds(0, 50);
+        dispatch(fetchProductsAC(responseIds));
+
+        await dispatch(productSlice.actions.setPage(0));
+    }
+    catch (e: any) {
+        dispatch(productSlice.actions.setIsLoading(false));
+        dispatch(productSlice.actions.setError(e.message));
+        console.error(e.message);
+    }
+}
+
+
 export const setPageAC = (page: number) => async (dispatch: AppDispatch) => {
     try {
         dispatch(productSlice.actions.setPage(page));
@@ -129,7 +154,6 @@ export const fetchAllBrandsAC = () => async (dispatch: AppDispatch) => {
         });
         const brands: string[] = responseBrands.data.result;
         const filteredBrands = Array.from(new Set(brands.filter(i => !!i)));
-        console.log(filteredBrands)
 
         dispatch(productSlice.actions.setAllBrands(filteredBrands));
     }

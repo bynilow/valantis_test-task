@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import styled from 'styled-components'
+import { palette } from '../../styles/style';
 
 interface IProductCardProps {
     id: string;
@@ -13,16 +14,18 @@ const ProductCard: FC<IProductCardProps> = ({id, product, brand, price}) => {
 
     return (
         <Card>
-            <Image />
-            <Id>
-                {id}
-            </Id>
-            <Name>
-                {product}
-            </Name>
-            <Brand>
-                {brand}
-            </Brand>
+            <Info>
+                <Image />
+                <Id>
+                    {id}
+                </Id>
+                <Name>
+                    {product}
+                </Name>
+                <Brand>
+                    {brand}
+                </Brand>
+            </Info>
             <Cost>
                 {
                     price.toLocaleString('ru', {
@@ -36,19 +39,25 @@ const ProductCard: FC<IProductCardProps> = ({id, product, brand, price}) => {
     );
 }
 
+const Info = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+`
 
 const Image = styled.div`
     width: 100%;
     aspect-ratio: 1/1;
     border-radius: 10px;
-    background: #c0c0c0;
+    background: ${palette.lightGray};
 
 `
 
 const Cost = styled.p`
     position: relative;
     font-size: 1rem;
-    color: green;
+    color: ${palette.green};
     margin-top: 10px;
     align-self: flex-end;
     cursor: pointer;
@@ -56,7 +65,7 @@ const Cost = styled.p`
     &::after{
         content: '';
         position: absolute;
-        background-color: green;
+        background-color: ${palette.green};
         bottom: -5px;
         right: 0;
         width: 0%;
@@ -73,7 +82,7 @@ const Cost = styled.p`
 `
 
 const Brand = styled.p`
-    
+    font-weight: 500;
 `
 
 const Name = styled.p`
@@ -86,16 +95,18 @@ const Id = styled.p`
     top: 0;
     right: 0;
     margin: 1rem;
+    font-size: 0.7rem;
 `
 
 const Card = styled.div`
     position: relative;
-    padding: 10px;
-    border: 1px solid black;
-    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 0 5px #0000002f;
+    border-radius: 10px; 
     width: 100%;
     height: 26rem;
     display: flex;
+    justify-content: space-between;
     flex-direction: column;
     gap: 10px;
 `

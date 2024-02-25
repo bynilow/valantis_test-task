@@ -1,11 +1,12 @@
 import { FC } from 'react';
 import styled, { keyframes } from 'styled-components'
+import { palette } from '../../styles/style';
 
-interface ILoadingProps {
+interface ILoaderProps {
 
 }
 
-const Loading: FC<ILoadingProps> = ({}) => {
+const Loader: FC<ILoaderProps> = ({}) => {
 
     return (  
         <Block>
@@ -37,9 +38,9 @@ const Block = styled.div`
     width: 5vw;
     height: 5vw;
     border-radius: 50%;
-    background-color: orange;
+    background-color: ${palette.accentColor};
 
     animation: ${Anim} 3s ease infinite;
 `
 
-export default Loading;
+export default Loader;

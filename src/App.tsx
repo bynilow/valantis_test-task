@@ -1,7 +1,7 @@
 import styled, { createGlobalStyle } from 'styled-components';
 import Container from './components/Container/Container';
 import Header from './components/Header/Header';
-import Main from './components/Main/Main';
+import Main from './components/Pages/Main';
 
 function App() {
 

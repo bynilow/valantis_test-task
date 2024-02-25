@@ -2,10 +2,11 @@ import { FC, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useDebounce } from '../../hooks/react';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
-import { fetchProductsIdWithFiltersAC } from '../../store/reducers/ActionCreator';
+import { fetchProductsIdWithFiltersAC, setSearchedProductsIdFromStoreAC } from '../../store/reducers/ActionCreator';
 import Container from '../Container/Container';
 import Dropdown from './Dropdown/Dropdown';
 import Input from './Inputs/Input';
+import ButtonSearch from './Buttons/ButtonSearch';
 
 interface IHeaderProps {
 
@@ -18,43 +19,26 @@ const Header: FC<IHeaderProps> = ({ }) => {
     const dispatch = useAppDispatch();
 
     const [nameValue, setNameValue] = useState('');
-    const debouncedName = useDebounce(nameValue, 1500);
 
     const [brandValue, setBrandValue] = useState('All');
-    const debouncedBrand = useDebounce(brandValue, 500);
 
     const [priceValue, setPriceValue] = useState('');
-    const debouncedCost = useDebounce(priceValue, 1500);
 
     
     const onChangeBrand = (brand: string) => {
         setBrandValue(brand);
     }
-    const onChangeCost = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setPriceValue(e.target.value);
+
+    const onClickSearch = () => {
+        if (nameValue.trim() || brandValue !== 'All' || priceValue.trim()) {
+            dispatch(fetchProductsIdWithFiltersAC(
+                priceValue, brandValue, nameValue
+            ));
+        }
+        else if(!isLoading){
+            dispatch(setSearchedProductsIdFromStoreAC())
+        }
     }
-
-    const isFirstMountRef = useRef(true);
-    useEffect(() => {
-        if (isFirstMountRef.current) {
-            isFirstMountRef.current = false
-        }
-        else if (!isLoading) {
-
-            // dispatch(fetchProductsIdWithNameAC(debouncedName.toString(), pageNumber*50, 50));
-        }
-    }, [debouncedName, debouncedBrand, debouncedCost])
-
-    // const onNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    //     if (e.key === 'Enter') {
-    //         if (nameValue.trim() || brandValue.trim() || priceValue.trim()) {
-    //             dispatch(fetchProductsIdWithFiltersAC(
-    //                 priceValue, brandValue, nameValue
-    //             ));
-    //         }
-    //         // dispatch(fetchProductsIdWithFiltersAC(nameValue.toString(), pageNumber*50, 50));
-    //     }
-    // }
 
     return (
         <HeaderBlock>
@@ -78,6 +62,9 @@ const Header: FC<IHeaderProps> = ({ }) => {
                             placeholder='Цена'
                             onChange={(e: string) => setPriceValue(e)}
                             type='number' />
+
+                        <ButtonSearch
+                            onClick={onClickSearch} />
                     </SearchBlock>
                 </HeaderInner>
             </Container>

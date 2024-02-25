@@ -1,5 +1,6 @@
 import { FC, useState } from 'react';
 import styled from 'styled-components'
+import { palette } from '../../../styles/style';
 
 const searchIcon = require('../../../icons/search.png'); 
 
@@ -25,11 +26,11 @@ const Input: FC<IInputProps> = ({onChange, type, placeholder}) => {
     }
 
     return (  
-        <Outer>
+        <Block>
             <InputName
                 type='text'
                 placeholder={placeholder}
-                maxLength={30}
+                maxLength={type === 'text' ? 30 : 11}
                 value={value}
                 onChange={(e) => onChangeValue(e)} />
             {
@@ -48,14 +49,15 @@ const Input: FC<IInputProps> = ({onChange, type, placeholder}) => {
                     
 
             }
-        </Outer>
+        </Block>
     );
 }
 
 const Currency = styled.div`
-    color: #b3b3b3;
+    color: ${palette.darkGray};
     line-height: 0;
     font-size: 1.5rem;
+    margin-bottom: 3px;
 `
 
 const SearchImage = styled.img`
@@ -76,11 +78,11 @@ const InputName = styled.input`
     }
 `
 
-const Outer = styled.div`
+const Block = styled.div`
     display: flex;
     align-items: center;
     gap: 5px;
-    border: 2px solid #b3b3b3;
+    border: 2px solid ${palette.darkGray};
     border-radius: 10px;
     font-size: 1rem;
     padding: 0.5rem;
@@ -89,7 +91,7 @@ const Outer = styled.div`
     transition: 0.2s;
 
     &:has(${InputName}:focus){
-        border: 2px solid #257ae8; 
+        border: 2px solid ${palette.accentColor}; 
     }
 
 `
