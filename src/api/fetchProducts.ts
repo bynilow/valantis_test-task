@@ -90,3 +90,13 @@ export const fetchIdsWithFilter = async ({filter, value}:Filter) => {
     sessionStorage.setItem(`${filter}: ${value}`, JSON.stringify(setted));
     return setted
 }
+
+export const fetchAllBrands = async () => {
+    const responseBrands = await axios.post(URL, {
+        "action": "get_fields",
+        "params": { "field": "brand" }
+    });
+    const brands: string[] = responseBrands.data.result;
+
+    return Array.from(new Set(brands.filter(i => !!i)));
+};

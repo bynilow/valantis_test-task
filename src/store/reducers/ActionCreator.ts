@@ -1,6 +1,6 @@
 import { IProduct } from './../../models/IProduct';
 import axios from "axios";
-import { fetchAllUniqueIds, fetchProductsData, fetchIdsWithFilter, fetchUniqueIds } from "../../api/fetchProducts";
+import { fetchAllUniqueIds, fetchProductsData, fetchIdsWithFilter, fetchUniqueIds, fetchAllBrands } from "../../api/fetchProducts";
 import { AppDispatch } from "../store";
 import { productSlice } from "./ProductSlice";
 import { getUniqueProducts } from '../../functions/getUniqueProducts';
@@ -135,14 +135,9 @@ export const setPageAC = (page: number) => async (dispatch: AppDispatch) => {
 
 export const fetchAllBrandsAC = () => async (dispatch: AppDispatch) => {
     try {
-        const responseBrands = await axios.post('http://api.valantis.store:40000/', {
-            "action": "get_fields",
-            "params": {"field": "brand"}
-        });
-        const brands: string[] = responseBrands.data.result;
-        const filteredBrands = Array.from(new Set(brands.filter(i => !!i)));
+        const brands = await fetchAllBrands();
 
-        dispatch(productSlice.actions.setAllBrands(filteredBrands));
+        dispatch(productSlice.actions.setAllBrands(brands));
     }
     catch (e: any) {
         dispatch(productSlice.actions.setError(e.message));
