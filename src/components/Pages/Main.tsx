@@ -3,11 +3,11 @@ import styled from 'styled-components';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { fetchAllBrandsAC, fetchAllIdsAC, fetchProductsAC } from '../../store/reducers/ActionCreator';
 import ProductCard from '../Cards/ProductCard';
-import Loading from '../Loading/Loader';
+import Loading from '../Loader/Loader';
 import PaginationButtons from '../Pagination/PaginationButtons';
 import { palette } from '../../styles/style';
 import Container from '../Container/Container';
-import { getNountText } from '../../functions/getNounText';
+import { getNounText } from '../../functions/getNounText';
 
 interface IMainProps {
 
@@ -44,7 +44,7 @@ const Main: FC<IMainProps> = ({ }) => {
                             searchedProductsId.length && !error
                                 ? <CountProducts>
                                     {searchedProductsId.length.toLocaleString('ru')} {
-                                        getNountText({
+                                        getNounText({
                                             number: searchedProductsId.length,
                                             one: 'товар',
                                             two: 'товара',
@@ -163,7 +163,7 @@ const Title = styled.h1`
 
 const List = styled.div`
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
     gap: 15px;
     border-radius: 10px;
     width: 100%;    

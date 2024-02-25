@@ -16,9 +16,7 @@ const timestamp = new Date().toISOString().split('T')[0].split('-').join('');
 const md = md5(`Valantis_${timestamp}`);
 axios.defaults.headers.post['X-Auth'] = md;
 
-console.log(md)
-
-export const fetchAllUniqueProductsId = async () => {
+export const fetchAllUniqueIds = async () => {
     const responseIds = await axios.post('http://api.valantis.store:40000/', {
         "action": "get_ids"
     });
@@ -27,7 +25,7 @@ export const fetchAllUniqueProductsId = async () => {
     return Array.from(new Set(data));
 }
 
-export const fetchUniqueProductIds = async (offset: number, limit: number) => {
+export const fetchUniqueIds = async (offset: number, limit: number) => {
     const responseIds = await axios.post('http://api.valantis.store:40000/', {
         "action": "get_ids",
         "params": {
@@ -72,8 +70,7 @@ interface INameFilter {
 }
 type Filter = INameFilter | IBrandFilter | IPriceFilter;
 
-export const fetchProductsIdWithFilter = async ({filter, value}:Filter) => { 
-    console.log(`${filter}: ${value}`)
+export const fetchIdsWithFilter = async ({filter, value}:Filter) => { 
     const cachedIds = sessionStorage.getItem(`${filter}: ${value}`);
     if(cachedIds){
         return JSON.parse(cachedIds);

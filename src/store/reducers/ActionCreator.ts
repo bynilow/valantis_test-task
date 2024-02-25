@@ -1,6 +1,6 @@
 import { IProduct } from './../../models/IProduct';
 import axios from "axios";
-import { fetchAllUniqueProductsId, fetchProductsData, fetchProductsIdWithFilter, fetchUniqueProductIds } from "../../api/fetchProducts";
+import { fetchAllUniqueIds, fetchProductsData, fetchIdsWithFilter, fetchUniqueIds } from "../../api/fetchProducts";
 import { AppDispatch } from "../store";
 import { productSlice } from "./ProductSlice";
 import { getUniqueProducts } from '../../functions/getUniqueProducts';
@@ -9,7 +9,7 @@ export const fetchAllIdsAC = () => async (dispatch: AppDispatch) => {
     try {
         dispatch(productSlice.actions.setIsLoading(true));
 
-        const idsProducts = await fetchAllUniqueProductsId();
+        const idsProducts = await fetchAllUniqueIds();
         await dispatch(productSlice.actions.setAllProductsId(idsProducts));
         await dispatch(productSlice.actions.setSearchedProductsId(idsProducts));
         const dataProducts: IProduct[] = await fetchProductsData([...idsProducts].splice(0,50));
@@ -32,7 +32,6 @@ export const fetchProductsAC = (ids: string[]) => async (dispatch: AppDispatch) 
 
         await dispatch(productSlice.actions.setProducts([]));
         const sliced = ids.splice(0,50);
-        console.log(sliced)
         const dataProducts = await fetchProductsData(sliced);
         const uniqueProducts = await getUniqueProducts(dataProducts);
         await dispatch(productSlice.actions.setProducts(uniqueProducts));
@@ -49,10 +48,9 @@ export const fetchProductsAC = (ids: string[]) => async (dispatch: AppDispatch) 
 export const fetchIdsWithFiltersAC = (price: string, brand: string, name: string) => async (dispatch: AppDispatch) => {
     try {
         dispatch(productSlice.actions.setIsLoading(true));
-        console.log(price.trim(), brand, name.trim())
         if(price.trim() === '' && brand === 'All' && name.trim() === ''){
             dispatch(productSlice.actions.setupSearchedProductsIdFromStore());
-            const responseIds = await fetchUniqueProductIds(0, 50);
+            const responseIds = await fetchUniqueIds(0, 50);
             dispatch(fetchProductsAC(responseIds));
         }
         else{
@@ -61,7 +59,7 @@ export const fetchIdsWithFiltersAC = (price: string, brand: string, name: string
             let idsName: string[] = [];
     
             if (price !== '' && parseInt(price.replace(/\s/g,''))){
-                const responsePrice = await fetchProductsIdWithFilter({
+                const responsePrice = await fetchIdsWithFilter({
                     filter: 'price',
                     value: parseInt(price.replace(/\s/g,''))
                 });
@@ -69,7 +67,7 @@ export const fetchIdsWithFiltersAC = (price: string, brand: string, name: string
                 idsPrice = [...responsePrice];
             }
             if(brand.trim() !== 'All'){
-                const responseBrand = await fetchProductsIdWithFilter({
+                const responseBrand = await fetchIdsWithFilter({
                     filter: 'brand',
                     value: brand.trim()
                 });
@@ -77,7 +75,7 @@ export const fetchIdsWithFiltersAC = (price: string, brand: string, name: string
                 idsBrand = [...responseBrand];
             }
             if(name.trim() !== ''){
-                const responseName = await fetchProductsIdWithFilter({
+                const responseName = await fetchIdsWithFilter({
                     filter: 'product',
                     value: name.toLocaleLowerCase().trim()
                 });
@@ -91,7 +89,6 @@ export const fetchIdsWithFiltersAC = (price: string, brand: string, name: string
                         .filter(id => idsPrice.length ? idsPrice.includes(id) : true)
                         
             const spliced = [...ids].splice(0, 50)
-            console.log(spliced)
             dispatch(productSlice.actions.setSearchedProductsId(Array.from(new Set(ids))));
     
             dispatch(fetchProductsAC(spliced));
@@ -113,7 +110,7 @@ export const setSearchedProductsIdFromStoreAC = () => async (dispatch: AppDispat
 
         await dispatch(productSlice.actions.setupSearchedProductsIdFromStore());
         dispatch(productSlice.actions.setupSearchedProductsIdFromStore());
-        const responseIds = await fetchUniqueProductIds(0, 50);
+        const responseIds = await fetchUniqueIds(0, 50);
         dispatch(fetchProductsAC(responseIds));
 
         await dispatch(productSlice.actions.setPage(0));

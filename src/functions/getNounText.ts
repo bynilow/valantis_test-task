@@ -5,7 +5,7 @@ interface IGetNounText{
     five: string;
 }
 
-export const getNountText = ({number, one, two, five}:IGetNounText) => {
+export const getNounText = ({number, one, two, five}:IGetNounText) => {
     number %= 100;
     if (number >= 5 && number <= 20) {
       return five;
